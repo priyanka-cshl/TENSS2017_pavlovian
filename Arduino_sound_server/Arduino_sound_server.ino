@@ -22,22 +22,31 @@ int sine3k2[]={ 1024,1401,1725,1950,2046,1998,1813,1517,1152,769,422,159,18,18,1
 //int sine5k[] = {2048,3252,3996,3996,3252,2049,845,100,100,843,2047,3251,3995,3996,3253,2050,846,101,100,843,2046,3250,3995,3996,3254,
 //2051,846,101,99,842,2045,3249,3995,3997,3255,2052,847,101,99,841,2044,3248,3994,3997,3255,2053,848,102,99,840,2043,};
 
-const int  lowTone = 38;    // the pin that reads the low
-const int  highTone = 40;    // the pin that reads the high
-const int  midTone = 36;
-const int  noiseTone = 26;    // the pin that reads the error signal
+const byte  lowTone = 38;    // the pin that reads the low
+const byte  highTone = 40;    // the pin that reads the high
+const byte  midTone = 36;
+const byte  noiseTone = 26;    // the pin that reads the error signal
+volatile bool playTone = false;
 
 // All sounds are written to DAC1:
 void setup() {                
-  pinMode(DAC1, OUTPUT);
-  pinMode(highTone, INPUT);
-  pinMode(lowTone, INPUT);
-  pinMode(midTone, INPUT);
-  attachInterrupt(noiseTone,whiteNoise,HIGH);
+  //pinMode(DAC1, OUTPUT);
+  //pinMode(highTone, INPUT);
+  //pinMode(lowTone, INPUT);
+  //pinMode(midTone, INPUT);
+  //attachInterrupt(noiseTone,whiteNoise,HIGH);
+
+  attachInterrupt(digitalPinToInterrupt(lowTone), PlayLowTone, RISING);
+  attachInterrupt(digitalPinToInterrupt(highTone), PlayHighTone, RISING);
+  attachInterrupt(digitalPinToInterrupt(midTone), PlayMidTone, RISING);
+  attachInterrupt(digitalPinToInterrupt(noiseTone), PlayWhiteNoise, RISING);
+
+  analogWriteResolution(12);
 }
 
 //This defines the action to be performed on interrupt, it plays white noise while the interrupt pin is HIGH
 //and writes LOW to the ouput pins
+
 void whiteNoise() {
      int wtNoise = random(0,4096);
      analogWrite(DAC1,wtNoise);
@@ -56,25 +65,75 @@ void whiteNoise() {
 
 //Play respective frequencies while read pin == HIGH
 void loop() {
-  while(digitalRead(highTone) == HIGH){
-  for(int i = 0; i<50 ;i = i++){
-    analogWriteResolution(12);
-    analogWrite(DAC1, sine3k[i]);
-    //delayMicroseconds(3);
-  }
-  }
-  while(digitalRead(lowTone) == HIGH){
-  for(int i = 0; i<50 ;i = i++){
-    analogWriteResolution(12);
-    analogWrite(DAC1, sine1k[i]);
-    //delayMicroseconds(14);
-  }
-  }
-  while(digitalRead(midTone) == HIGH){
-  for(int i = 0; i<50 ;i = i++){
-    analogWriteResolution(12);
-    analogWrite(DAC1, sine3k2[i]);
-    delayMicroseconds(1);
-  }
+//  while(digitalRead(highTone) == HIGH){
+//  for(int i = 0; i<50 ;i = i++){
+//    analogWriteResolution(12);
+//    analogWrite(DAC1, sine3k[i]);
+//    //delayMicroseconds(3);
+//  }
+//  }
+//  while(digitalRead(lowTone) == HIGH){
+//  for(int i = 0; i<50 ;i = i++){
+//    analogWriteResolution(12);
+//    analogWrite(DAC1, sine1k[i]);
+//    //delayMicroseconds(14);
+//  }
+//  }
+//  while(digitalRead(midTone) == HIGH){
+//  for(int i = 0; i<50 ;i = i++){
+//    analogWriteResolution(12);
+//    analogWrite(DAC1, sine3k2[i]);
+//    delayMicroseconds(1);
+//  }
+//  }
+}
+
+
+// one function for each tone type
+void PlayLowTone()
+{
+  while(digitalRead(lowTone) == HIGH)
+  {
+    for(int i = 0; i<50 ;i = i++)
+    {
+      analogWriteResolution(12);
+      analogWrite(DAC1, sine1k[i]);
+    }
   }
 }
+
+void PlayMidTone()
+{
+  while(digitalRead(midTone) == HIGH)
+  {
+    for(int i = 0; i<50 ;i = i++)
+    {
+      analogWrite(DAC1, sine3k2[i]);
+    }
+  }
+}
+
+void PlayHighTone()
+{
+  while(digitalRead(highTone) == HIGH)
+  {
+    for(int i = 0; i<50 ;i = i++)
+    {
+      analogWrite(DAC1, sine3k[i]);
+    }
+  }
+}
+
+void PlayWhiteNoise()
+{
+  while(digitalRead(noiseTone) == HIGH)
+  {
+    for(int i = 0; i<50 ;i = i++)
+    {
+      //analogWrite(DAC1, sine3k[i]);
+      int wtNoise = random(0,4096);
+      analogWrite(DAC1,wtNoise);
+    }
+  }
+}
+
