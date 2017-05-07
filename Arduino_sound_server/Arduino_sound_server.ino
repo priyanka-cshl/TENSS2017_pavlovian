@@ -1,4 +1,4 @@
-//1kHz
+ //  ff//1kHz
 //int sine1k[] = {2048,2305,2557,2802,3035,3252,3450,3626,3777,3901,3996,4060,4092,4092,4060,3996,3901,3777,3626,3450,3252,3035,2802
 //,2558,2305,2049,1792,1539,1295,1062,845,647,470,319,195,100,36,4,4,36,100,195,318,469,645,843,1061,1293,1538,1790,2047,};
 
@@ -25,46 +25,53 @@ int sine3k2[]={ 1024,1401,1725,1950,2046,1998,1813,1517,1152,769,422,159,18,18,1
 const byte  lowTone = 38;    // the pin that reads the low
 const byte  highTone = 40;    // the pin that reads the high
 const byte  midTone = 36;
-const byte  noiseTone = 26;    // the pin that reads the error signal
+const byte  noiseTone = 34;    // the pin that reads the error signal
 volatile bool playTone = false;
 
 // All sounds are written to DAC1:
 void setup() {                
   //pinMode(DAC1, OUTPUT);
   //pinMode(highTone, INPUT);
-  //pinMode(lowTone, INPUT);
+  pinMode(lowTone, INPUT);
   //pinMode(midTone, INPUT);
   //attachInterrupt(noiseTone,whiteNoise,HIGH);
 
-  attachInterrupt(digitalPinToInterrupt(lowTone), PlayLowTone, RISING);
-  attachInterrupt(digitalPinToInterrupt(highTone), PlayHighTone, RISING);
-  attachInterrupt(digitalPinToInterrupt(midTone), PlayMidTone, RISING);
-  attachInterrupt(digitalPinToInterrupt(noiseTone), PlayWhiteNoise, RISING);
-
+//  attachInterrupt(digitalPinToInterrupt(lowTone), PlayLowTone, RISING);
+//  attachInterrupt(digitalPinToInterrupt(highTone), PlayHighTone, RISING);
+//  attachInterrupt(digitalPinToInterrupt(midTone), PlayMidTone, RISING);
+//  attachInterrupt(digitalPinToInterrupt(noiseTone), PlayWhiteNoise, RISING);
+  Serial.begin(115200);
   analogWriteResolution(12);
+    pinMode(13, OUTPUT);
+
 }
 
 //This defines the action to be performed on interrupt, it plays white noise while the interrupt pin is HIGH
 //and writes LOW to the ouput pins
 
-void whiteNoise() {
-     int wtNoise = random(0,4096);
-     analogWrite(DAC1,wtNoise);
-    
-    //for(int i = 0; i<50 ;i = i++){
-    //analogWriteResolution(12);
-    //analogWrite(DAC1, wtNoise[i]);
-    //delayMicroseconds(50000);
-    //}
-         
-   digitalWrite(highTone, LOW);
-   digitalWrite(lowTone, LOW);
-   digitalWrite(midTone, LOW);
-
-}
+//void whiteNoise() {
+//     int wtNoise = random(0,4096);
+//     analogWrite(DAC1,wtNoise);
+//    
+//    //for(int i = 0; i<50 ;i = i++){
+//    //analogWriteResolution(12);
+//    //analogWrite(DAC1, wtNoise[i]);
+//    //delayMicroseconds(50000);
+//    //}
+//         
+////   digitalWrite(highTone, LOW);
+////   digitalWrite(lowTone, LOW);
+////   digitalWrite(midTone, LOW);
+//
+//}
 
 //Play respective frequencies while read pin == HIGH
 void loop() {
+  Serial.println(digitalRead(lowTone));
+//    digitalWrite(13, HIGH);   // turn the LED on (HIGH is the voltage level)
+//  delay(1000);              // wait for a second
+//  digitalWrite(13, LOW);    // turn the LED off by making the voltage LOW
+//  delay(1000);              // wait for a second
 //  while(digitalRead(highTone) == HIGH){
 //  for(int i = 0; i<50 ;i = i++){
 //    analogWriteResolution(12);
@@ -72,13 +79,13 @@ void loop() {
 //    //delayMicroseconds(3);
 //  }
 //  }
-//  while(digitalRead(lowTone) == HIGH){
-//  for(int i = 0; i<50 ;i = i++){
-//    analogWriteResolution(12);
-//    analogWrite(DAC1, sine1k[i]);
-//    //delayMicroseconds(14);
-//  }
-//  }
+  while(digitalRead(lowTone) == HIGH){
+  for(int i = 0; i<50 ;i = i++){
+    analogWriteResolution(12);
+    analogWrite(DAC1, sine1k[i]);
+    //delayMicroseconds(14);
+  }
+  }
 //  while(digitalRead(midTone) == HIGH){
 //  for(int i = 0; i<50 ;i = i++){
 //    analogWriteResolution(12);
@@ -89,18 +96,19 @@ void loop() {
 }
 
 
-// one function for each tone type
-void PlayLowTone()
-{
-  while(digitalRead(lowTone) == HIGH)
-  {
-    for(int i = 0; i<50 ;i = i++)
-    {
-      analogWriteResolution(12);
-      analogWrite(DAC1, sine1k[i]);
-    }
-  }
-}
+//// one function for each tone type
+//void PlayLowTone()
+//{
+//  while(digitalRead(lowTone))
+//  {
+//  Serial.println("running");
+//    for(int i = 0; i<50 ;i = i++)
+//    {
+//      analogWriteResolution(12);
+//      analogWrite(DAC1, sine1k[i]);
+//    }
+//  }
+//}
 
 void PlayMidTone()
 {
